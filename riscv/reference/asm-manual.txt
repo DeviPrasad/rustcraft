@@ -1,0 +1,101 @@
+
+RISC-V Assembly Language Manual
+
+This is a good starting point: https://rv8.io/asm.html
+This is another similar reference: https://github.com/riscv/riscv-asm-manual/blob/master/riscv-asm.md
+
+RV32 user-level, integer only instructions.
+
+Assembler Directives
+
+Directives      Arguments                       
+.align          integer
+.p2align        p2,[pad_val=0],max              align to power of 2
+.balign         b,[pad_val=0]                   byte align
+
+.section        [{.text,.data,.rodata,.bss}]    emit section (if not present, default .text) and make current
+
+.string         "string"                        emit string
+.asciz          "string"                        emit string (alias for .string)
+.equ            name, value                     constant definition
+.macro          name arg1 [, argn]              begin macro definition \argname to substitute
+.endm
+
+.text                                           emit .text section (if not present) and make current
+.data                                           emit .data section (if not present) and make current
+.rodata                                         emit .rodata section (if not present) and make current
+.bss
+
+.byte           expr [, expr]*                  8-bit comma separated words
+.2byte          expr [, expr]*                  16-bit comma separated words
+.half           expr [, expr]*                  16-bit comma separated words
+.short          expr [, expr]*                  16-bit comma separated words
+.4byte          expr [, expr]*                  32-bit comma separated words
+.word           expr [, expr]*                  32-bit comma separated words
+.long           expr [, expr]*                  32-bit comma separated words
+.8byte          expr [, expr]*                  64-bit comma separated words
+.dword          expr [, expr]*                  64-bit comma separated words
+.quad           expr [, expr]*                  64-bit comma separated words
+
+.zero   integer zero bytes
+
+
+Labels
+-------
+Text labels are used as branch, unconditional jump targets and symbol offsets.
+Text labels are added to the symbol table of the compiled module.
+
+loop:
+        j loop
+
+Numeric labels are used for local references. References to local labels are suffixed 
+with 'f' for a forward reference or 'b' for a backwards reference.
+
+1:
+        j 1b
+
+Assembler Relocation Functions
+The following table lists assembler relocation expansions:
+
+Assembler               Notation                    Description Instruction / Macro
+%hi(symbol)             Absolute (HI20)             lui
+%lo(symbol)             Absolute (LO12)             load, store, add
+%pcrel_hi(symbol)       PC-relative (HI20)          auipc
+%pcrel_lo(label)        PC-relative (LO12)          load, store, add
+
+
+Assembler Pseudo-instructions
+-------------------------------
+The assembler implements a number of convenience psuedo-instructions that are formed 
+from instructions in the base ISA, but have implicit arguments or in some case reversed arguments,
+that result in distinct semantics.
+
+The following table lists RISC-V assembler pseudo instructions:
+
+Pseudo-instructions         Expansion                   Description
+------------------------------------------------------------------------
+nop                         addi zero,zero,0            No operation
+li rd, expression           (several expansions)        Load immediate
+la rd, symbol               (several expansions)        Load address
+mv rd, rs1                  addi rd, rs, 0              Copy register
+not rd, rs1                 xori rd, rs, -1             One’s complement
+neg rd, rs1                 sub rd, x0, rs              Two’s complement
+negw rd, rs1                subw rd, x0, rs             Two’s complement Word
+sext.w rd, rs1              addiw rd, rs, 0             Sign extend Word
+seqz rd, rs1                sltiu rd, rs, 1             Set if = zero
+snez rd, rs1                sltu rd, x0, rs             Set if ≠ zero
+sltz rd, rs1                slt rd, rs, x0              Set if < zero
+sgtz rd, rs1                slt rd, x0, rs              Set if > zero
+beqz rs1, offset            beq rs, x0, offset          Branch if = zero
+bnez rs1, offset            bne rs, x0, offset          Branch if ≠ zero
+blez rs1, offset            bge x0, rs, offset          Branch if ≤ zero
+bgez rs1, offset            bge rs, x0, offset          Branch if ≥ zero
+bltz rs1, offset            blt rs, x0, offset          Branch if < zero
+bgtz rs1, offset            blt x0, rs, offset          Branch if > zero
+bgt rs, rt, offset          blt rt, rs, offset          Branch if >
+ble rs, rt, offset          bge rt, rs, offset          Branch if ≤
+bgtu rs, rt, offset         bltu rt, rs, offset         Branch if >, unsigned
+bleu rs, rt, offset         bltu rt, rs, offset         Branch if ≤, unsigned
+j offset                    jal x0, offset              Jump
+jr offset                   jal x1, offset              Jump register
+ret                         jalr x0, x1, 0              Return from subroutine

@@ -24,9 +24,12 @@ pub enum Token {
     RightParen,
 
     Proc,
+    Macro,
     Return,
     True,
     False,
+    Begin,
+    End,
 
     Byte,
     HalfWord,
@@ -39,6 +42,12 @@ pub enum Token {
 
     ByteAlign,
     P2Align,
+
+    Section,
+    TextSection,
+    DataSection,
+    UninitializedData,
+    ReadOnlyData,
 
     Eof,
     Illegal(char),

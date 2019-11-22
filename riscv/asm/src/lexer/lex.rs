@@ -133,12 +133,38 @@ impl<'a> Lexer<'a> {
 
     fn lookup_keyword(id: String) -> Token {
         match id.as_str() {
-            ".byte"  => Token::Byte,
-            ".proc"  => Token::Proc,
-            "return" => Token::Return,
-            "true"   => Token::True,
-            "false"  => Token::False,
-            "zero"   => Token::Zero,
+            ".byte"   => Token::Byte,
+            ".2byte"  => Token::HalfWord,
+            ".half"   => Token::HalfWord,
+            ".short"  => Token::HalfWord,
+            ".4byte"  => Token::Word,
+            ".word"   => Token::Word,
+            ".long"   => Token::Word,
+            ".8byte"  => Token::DoubleWord,
+            ".dword"  => Token::DoubleWord,
+            ".quad"   => Token::DoubleWord,
+            ".string" => Token::Str,
+            ".asciz"  => Token::Strz,
+            ".equ"    => Token::Equ,
+
+            ".proc"   => Token::Proc,
+            ".macro"  => Token::Macro,
+            ".begin"  => Token::Begin,
+            ".end"    => Token::End,
+            "return"  => Token::Return,
+            "true"    => Token::True,
+            "false"   => Token::False,
+            "zero"    => Token::Zero,
+
+            ".align"   => Token::ByteAlign,
+            ".p2align" => Token::P2Align,
+            ".section" => Token::Section,
+            ".data"    => Token::DataSection,
+            ".text"    => Token::TextSection,
+            ".rodata"  => Token::ReadOnlyData,
+            ".bss"     => Token::UninitializedData,
+
+
             _ =>  Token::Iden(id),
         }
     }

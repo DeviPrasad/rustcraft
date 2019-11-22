@@ -20,6 +20,9 @@ Directives      Arguments
 .equ            name, value                     constant definition
 .macro          name arg1 [, argn]              begin macro definition \argname to substitute
 .endm
+.proc
+.begin
+.end
 
 .text                                           emit .text section (if not present) and make current
 .data                                           emit .data section (if not present) and make current

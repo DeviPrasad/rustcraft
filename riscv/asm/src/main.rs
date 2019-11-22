@@ -1,9 +1,9 @@
 #[path = "lexer/lex.rs"] mod lex;
-#[path = "lexer/token.rs"] mod token;
+//#[path = "lexer/token.rs"] mod token;
 
 use lex::Lexer;
-use lex::Source;
-use token::Token;
+//use lex::Source;
+//use token::Token;
 
 fn main() {
     println!("\nRISC-V Assembler.\n");

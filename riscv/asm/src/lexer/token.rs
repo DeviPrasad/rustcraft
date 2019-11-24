@@ -2,12 +2,13 @@
 pub enum Token {
     Iden(String),
     Number(String),
+    Hex(String),
     Label(String),
-
-    Zero,
+    Reg(u8),
     Assign,
     Negate,
     Minus,
+
     Plus,
     Div,
     Mult,
@@ -49,6 +50,6 @@ pub enum Token {
     UninitializedData,
     ReadOnlyData,
 
-    Eof,
-    Illegal(char),
+    Bad(char),
+    BadLexeme(String)
 }

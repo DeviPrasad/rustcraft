@@ -1,12 +1,14 @@
 ;;
-;; strin copy
+;; stringcopy
 ;;
 
 .section .data
 
-data: .byte "Some crazy long string to copy"
+data: .byte "RISC V Instruction Set"
 
-.equ  to, 0x80   ; = 128
+.equ  tx80, 0xTFAB80    ; = 128
+.equ  t800, 800     ;
+.equ  t0800, 0800   ;
 
 .section .text
 loop:

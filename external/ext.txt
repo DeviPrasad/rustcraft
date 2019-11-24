@@ -1,0 +1,14 @@
+
+
+Docopt for Rust with automatic type based decoding (i.e., data validation).
+Based on http://docopt.org/
+
+git clone https://github.com/docopt/docopt.rs.git
+
+
+A Rust library for option parsing for CLI utilities.
+
+https://github.com/rust-lang/getopts.git
+
+https://github.com/clap-rs/clap.git
+

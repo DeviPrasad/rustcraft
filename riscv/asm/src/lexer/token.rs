@@ -1,4 +1,4 @@
-#[derive(Debug,PartialEq)]
+#[derive(Debug, PartialEq)]
 pub enum Token {
     Iden(String),
     Number(String),
@@ -52,4 +52,11 @@ pub enum Token {
 
     Bad(char),
     BadLexeme(String)
+}
+
+use std::fmt;
+impl fmt::Display for Token {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        return fmt::Debug::fmt(self, f); // alternatively, write!(f, "{:?}", self)
+    }
 }

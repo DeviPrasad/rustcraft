@@ -2,8 +2,7 @@ use std::fs;
 use std::iter::Peekable;
 use std::str::Chars;
 
-#[path = "token.rs"] mod token;
-use token::Token;
+use crate::token::Token;
 
 #[derive(Debug)]
 pub struct Source {
@@ -27,12 +26,16 @@ pub fn read_asm(asmfile: &str) -> Source {
 #[derive(Debug)]
 pub struct Lexer<'a> {
     buf: Peekable<Chars<'a>>,
-    lnum: u32,
+    lineno: u32,
 }
 
 impl<'a> Lexer<'a> {
     pub fn new(text: &str) -> Lexer {
-        Lexer { buf: text.chars().peekable(), lnum: 1 }
+        Lexer { buf: text.chars().peekable(), lineno: 1 }
+    }
+
+    pub fn linenum(&mut self) -> u32 {
+        self.lineno
     }
 
     pub fn from(src: &Source) -> Lexer {
@@ -47,10 +50,37 @@ impl<'a> Lexer<'a> {
     fn peek(&mut self) -> Option<&char> {
         self.buf.peek()
     }
+
+    pub fn eat(&mut self, accept: Token) -> Result<(), (String, u32)>{
+        let nxt = self.next_token();
+        let mut msg = String::from("Expected '");
+        msg.push_str(&accept.to_string());
+        match (nxt, accept) {
+            (Some(tok), a) => {
+                if tok == a {
+                    Ok(())
+                } else {
+                    msg.push_str("', found '");
+                    msg.push_str(&tok.to_string());
+                    msg.push_str("'.");
+                    let e = (msg, self.linenum());
+                    Err(e)
+                }
+            },
+            (None, _a) => {
+                let e = (msg, self.linenum());
+                Err(e)
+            }
+        }
+    }
+
     fn eat_whitespaces(&mut self) {
         while let Some(&c) = self.buf.peek() {
             if !c.is_whitespace() {
                 break;
+            }
+            if c == '\n' {
+                self.lineno += 1;
             }
             self.next();
         }
@@ -161,11 +191,13 @@ impl<'a> Lexer<'a> {
                         let lexme = self.iden(c);
                         if let Some(tok) = Self::lookup_keyword(&lexme) {
                             Some(tok)
-                        } else if self.peek() == Some(&':') {
-                            self.next();
-                            Some(Token::Label(lexme))
                         } else {
-                            Some(Token::Iden(lexme))
+                            self.eat_whitespaces();
+                            if self.peek() == Some(&':') {
+                                self.next();
+                                return Some(Token::Label(lexme));
+                            }
+                            return Some(Token::Iden(lexme));
                         }
                     } else if c.is_digit(10) {
                         if c != '0' {
@@ -173,8 +205,8 @@ impl<'a> Lexer<'a> {
                         }
                         let ch = self.next().unwrap();
                         if !(ch == 'x' || ch == 'X') {
-                            return Some(Token::Number(self.number(ch)));
-                        } else {
+                            return Some(Token::Number(self.number(c)));
+                        } else { // TODO: OCTAL and BINARY
                             return self.hexnum();
                         }
                     } else {
@@ -259,8 +291,8 @@ impl<'a> Lexer<'a> {
 
             "proc"   => Some(Token::Proc),
             "macro"  => Some(Token::Macro),
-            "begin"  => Some(Token::Begin),
-            "end"    => Some(Token::End),
+            "procbegin"  => Some(Token::Begin),
+            "procend"    => Some(Token::End),
             "return" => Some(Token::Return),
             _        => Lexer::lookup_directive(id),
         }
@@ -284,8 +316,8 @@ impl<'a> Lexer<'a> {
 
             ".proc"   => Some(Token::Proc),
             ".macro"  => Some(Token::Macro),
-            ".begin"  => Some(Token::Begin),
-            ".end"    => Some(Token::End),
+            ".procbegin"  => Some(Token::Begin),
+            ".procend"    => Some(Token::End),
 
             ".align"   => Some(Token::ByteAlign),
             ".p2align" => Some(Token::P2Align),

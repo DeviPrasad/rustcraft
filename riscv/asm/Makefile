@@ -1,5 +1,5 @@
 dev:
-	RUSTFLAGS="-A unused_imports -A dead_code" cargo build
+	RUSTFLAGS="-A unused_imports -A dead_code -A unreachable_code" cargo build
 
 release:
 	cargo build
@@ -7,3 +7,5 @@ release:
 clean:
 	cargo clean
 
+run:
+	RUSTFLAGS="-A unused_imports -A dead_code -A unreachable_code" cargo run
